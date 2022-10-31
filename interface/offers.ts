@@ -1,8 +1,8 @@
 import item from "./item";
 
-type order = {
+type offers = {
   items: item;
   discount: number;
   category: string;
 };
-export default order;
+export default offers;

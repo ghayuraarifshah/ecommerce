@@ -4,9 +4,16 @@ import {
   faHeart,
   faShoppingCart,
 } from "@fortawesome/free-solid-svg-icons";
-const Header = () => {
+import user from "../interface/user";
+import React, { useEffect, useRef } from "react";
+import Link from "next/link";
+interface Props {
+  user: user;
+}
+const Header: React.FC<Props> = ({ user }) => {
+  useEffect(() => {}, []);
   return (
-    <div className="flex bg-purple-700 justify-between items-center fixed w-full top-0 z-10">
+    <div className={`flex bg-purple-700 justify-between items-center `}>
       <div className="flex">
         <div className="p-3">
           <span className="text-3xl">🏪</span>
@@ -21,8 +28,14 @@ const Header = () => {
           <FontAwesomeIcon icon={faSearch} className="px-2 text-gray-600" />
         </div>
       </div>
-      <div className="flex mx-5">
-        <div className="rounded-full w-5 h-5 bg-slate-600"></div>
+      <div className="flex mx-5 my-auto h-9 items-center">
+        <Link href="/user">
+          <img
+            src={`https://avatars.dicebear.com/api/initials/${user.lastName}.svg`}
+            alt=""
+            className="h-8 rounded-full cursor-pointer"
+          />
+        </Link>
         <FontAwesomeIcon
           icon={faHeart}
           className="px-2 text-2xl text-pink-500 mx-3"

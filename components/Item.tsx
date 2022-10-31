@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faStar,
@@ -12,8 +12,13 @@ import {
 } from "@fortawesome/free-regular-svg-icons";
 import type itemType from "../interface/item";
 import ItemExtened from "./ItemExtened";
+import order from "../interface/order";
+import item from "../interface/item";
+import user from "../interface/user";
 interface Props {
+  user: user;
   item: itemType;
+  placeOrder: (order: order) => void;
 }
 interface RatingsProp {
   ratings: number;
@@ -32,15 +37,43 @@ const Ratings: React.FC<RatingsProp> = ({ ratings }) => {
   }
   return <div className="">{item}</div>;
 };
-const Item: React.FC<Props> = ({ item }) => {
+const Item: React.FC<Props> = ({ item, placeOrder, user }) => {
+  const [order, setOrder] = useState<order>({
+    items: [item],
+    quantity: 1,
+    total: Math.floor(item.price),
+    orderedBy: user._id,
+  });
+  function changeQuatity(opp: "add" | "sub") {
+    if (order.quantity <= 1 && opp == "sub") return;
+    const newQuantity = opp == "add" ? order.quantity + 1 : order.quantity - 1;
+    setOrder({
+      items: [item],
+      quantity: newQuantity,
+      total: Math.floor(item.price) * newQuantity,
+      orderedBy: user._id,
+    });
+    return;
+  }
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const description = item.description.substring(0, 200);
   function closePopup() {
     setIsOpen(false);
   }
+  function _placeOrder() {
+    placeOrder(order);
+    setIsOpen(false);
+  }
   return (
     <>
-      <ItemExtened item={item} isOpen={isOpen} closePopup={closePopup} />
+      <ItemExtened
+        item={item}
+        isOpen={isOpen}
+        closePopup={closePopup}
+        changeQuantity={changeQuatity}
+        order={order}
+        placeOrder={_placeOrder}
+      />
       <div className="max-w-sm rounded overflow-hidden shadow-lg mx-4 my-5 relative z-0">
         <div className="absolute right-1 top-1 px-2 py-1 rounded-full bg-white">
           <FontAwesomeIcon icon={faHeartOutline} className="text-pink-600" />

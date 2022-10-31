@@ -2,13 +2,23 @@ import React, { useState } from "react";
 import itemType from "../interface/item";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTimes } from "@fortawesome/free-solid-svg-icons";
+import order from "../interface/order";
 interface Props {
   item: itemType;
   isOpen: boolean;
   closePopup: () => void;
+  changeQuantity: (opp: "add" | "sub") => void;
+  order: order;
+  placeOrder: () => void;
 }
-const ItemExteneded: React.FC<Props> = ({ item, isOpen, closePopup }) => {
-  useState();
+const ItemExteneded: React.FC<Props> = ({
+  item,
+  isOpen,
+  closePopup,
+  changeQuantity,
+  order,
+  placeOrder,
+}) => {
   return (
     <>
       <div
@@ -29,39 +39,41 @@ const ItemExteneded: React.FC<Props> = ({ item, isOpen, closePopup }) => {
             <FontAwesomeIcon icon={faTimes} />
           </div>
         </div>
-        <div className="lg:flex">
+        <div className="flex lg:flex-row flex-col">
           <img
             src={item.image}
-            className=" lg:m-4 bg-cover lg:rounded-md text-center overflow-hidden "
+            className=" flex-1 lg:m-4 bg-cover lg:rounded-md text-center overflow-hidden "
           />
-          <div className="p-4 flex flex-col leading-normal">
+          <div className="flex-1 p-4 flex flex-col leading-normal">
             <div className="mb-8">
               <div className="text-gray-900 font-bold text-xl mb-2">
-                Can coffee make you a better developer?
+                {item.title}
               </div>
-              <p className="text-gray-700 text-base">
-                Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-                Voluptatibus quia, nulla! Maiores et perferendis eaque,
-                exercitationem praesentium nihil.
-              </p>
+              <p className="text-gray-700 text-base">{item.description}</p>
             </div>
             <div className="flex items-center justify-between mt-5">
               <div className="flex justify-between w-1/4 border border-gray-400 rounded-md">
-                <div className="px-4 my-2 border-r border-gray-400 text-xl">
+                <button
+                  className="px-3 my-2 border-r border-gray-400 text-xl cursor-pointer"
+                  onClick={() => changeQuantity("sub")}
+                >
                   -
+                </button>
+                <div className="w-5 flex justify-center items-center text-md">
+                  {order.quantity}
                 </div>
-                <div className="w-1/2 flex justify-center items-center text-md">
-                  1
-                </div>
-                <div className="px-4 my-2 border-l border-gray-400 text-md">
+                <button
+                  className="px-3 my-2 border-l border-gray-400 text-md cursor-pointer"
+                  onClick={() => changeQuantity("add")}
+                >
                   +
-                </div>
+                </button>
               </div>
-              <div className="mx-16 text-xl">$55</div>
+              <div className="mx-16 text-xl">${order.quantity}</div>
             </div>
             <div className="flex items-center justify-between mt-10">
               <p className="font-bold text-xl">Total Price: </p>
-              <p className="mx-16 text-xl">$55</p>
+              <p className="mx-16 text-xl">${order.quantity}</p>
             </div>
           </div>
         </div>
@@ -72,7 +84,10 @@ const ItemExteneded: React.FC<Props> = ({ item, isOpen, closePopup }) => {
           >
             Cancel
           </button>
-          <button className="px-10 py-2 bg-green-600 rounded-md text-md text-white">
+          <button
+            onClick={placeOrder}
+            className="px-10 py-2 bg-green-600 rounded-md text-md text-white"
+          >
             Place Order
           </button>
         </div>

@@ -1,0 +1,22 @@
+[
+  {
+    "name": "Neil",
+    "lastName": "Mayert",
+    "email": "Cielo.Lebsack70@yahoo.com",
+    "phoneNumber": "1-987-966-1902",
+    "billingAdress": {
+      "addressLine1": "Street 1",
+      "addressLine2": "Street 2",
+      "city": "Delhi",
+      "state": "Delhi",
+      "zipCode": 190014
+    },
+    "shippingAddress": {
+      "addressLine1": "Street 1",
+      "addressLine2": "Street 2",
+      "city": "Delhi",
+      "state": "Delhi",
+      "zipCode": 190014
+    }
+  }
+]
