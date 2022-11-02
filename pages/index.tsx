@@ -12,11 +12,14 @@ import user from "../interface/user";
 import userModel from "../models/user";
 import order from "../interface/order";
 import secret from "../secret";
+import cart from "../interface/cart";
+import cartModel from "../models/cart";
 interface Props {
   items: item[];
   user: user;
+  cart: cart;
 }
-const Home: NextPage<Props> = ({ items, user }) => {
+const Home: NextPage<Props> = ({ items, user, cart }) => {
   const arrOfItems = [];
   for (let i = 0; i !== Math.ceil(items.length / 8); i++) {
     arrOfItems.push(items.slice(i * 8, (i + 1) * 8));
@@ -32,16 +35,59 @@ const Home: NextPage<Props> = ({ items, user }) => {
     }
   }
   const [index, setIndex] = useState(0);
+  const [_cart, setCart] = useState<cart>(cart);
   async function placeOrder(order: order) {
-    console.log(user);
     fetch("/api/place-order", {
       method: "POST",
       body: JSON.stringify({ userId: user._id, order: order }),
     });
   }
+  async function addToCart(item: item) {
+    const itemPresent = _cart.items.filter((el) => {
+      return el.item._id == item._id;
+    })[0];
+    if (itemPresent) {
+      const index = _cart.items.indexOf(itemPresent);
+      _cart.items[index].quantity += 1;
+      _cart.quantity += 1;
+      const totalArr = _cart.items.map((el) => {
+        return Math.floor(el.item.price) * el.quantity;
+      });
+      const total = totalArr.reduce(
+        (previousValue, currentValue) => previousValue + currentValue,
+        0
+      );
+      _cart.total = total;
+      try {
+        const res = await fetch("/api/change-cart", {
+          method: "POST",
+          body: JSON.stringify(_cart),
+        });
+        const newCart = await res.json();
+        setCart(newCart);
+      } catch (error) {
+        alert("Something went wrong");
+      }
+      return;
+    }
+    _cart.items.push({
+      item,
+      quantity: 1,
+    });
+    _cart.quantity += 1;
+    _cart.total +=
+      _cart.items[index].quantity * Math.floor(_cart.items[index].item.price);
+    const res = await fetch("/api/change-cart", {
+      method: "POST",
+      body: JSON.stringify(_cart),
+    });
+    const newCart = await res.json();
+    setCart(newCart);
+    return;
+  }
   return (
     <>
-      <Header user={user} />
+      <Header user={user} cart={_cart} />
       <main>
         <Head>
           <title>Create Next App</title>
@@ -50,7 +96,13 @@ const Home: NextPage<Props> = ({ items, user }) => {
         <main className="flex flex-col bg-white">
           <div className="flex flex-wrap">
             {arrOfItems[index].map((el) => (
-              <Item user={user} item={el} key={el.id} placeOrder={placeOrder} />
+              <Item
+                user={user}
+                item={el}
+                key={el._id}
+                placeOrder={placeOrder}
+                addToCart={addToCart}
+              />
             ))}
           </div>
           <div className="flex mx-auto my-5 items-center ">
@@ -89,11 +141,38 @@ export async function getServerSideProps() {
   const conn = await mongoose.connect(secret.monogo);
   const items: item[] = await itemModel.find();
   const user: user[] = await userModel.find();
+  const cart: cart | null = await cartModel
+    .findOne<cart>({ owner: user[0]._id })
+    .populate({
+      path: "items",
+      populate: {
+        path: "item",
+        model: "item",
+      },
+    });
+  if (cart == null) {
+    const cart = new cartModel<cart>({
+      items: [],
+      quantity: 0,
+      total: 0,
+      owner: user[0]._id,
+    });
+    await cart.save();
+    conn.disconnect();
+    return {
+      props: {
+        items: JSON.parse(JSON.stringify(items)),
+        user: JSON.parse(JSON.stringify(user[0])),
+        cart: JSON.parse(JSON.stringify(cart)),
+      },
+    };
+  }
   conn.disconnect();
   return {
     props: {
       items: JSON.parse(JSON.stringify(items)),
       user: JSON.parse(JSON.stringify(user[0])),
+      cart: JSON.parse(JSON.stringify(cart)),
     },
   };
 }

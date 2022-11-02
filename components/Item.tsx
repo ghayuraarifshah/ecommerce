@@ -19,6 +19,7 @@ interface Props {
   user: user;
   item: itemType;
   placeOrder: (order: order) => void;
+  addToCart: (item: item) => void;
 }
 interface RatingsProp {
   ratings: number;
@@ -37,7 +38,7 @@ const Ratings: React.FC<RatingsProp> = ({ ratings }) => {
   }
   return <div className="">{item}</div>;
 };
-const Item: React.FC<Props> = ({ item, placeOrder, user }) => {
+const Item: React.FC<Props> = ({ item, placeOrder, user, addToCart }) => {
   const [order, setOrder] = useState<order>({
     items: [item],
     quantity: 1,
@@ -94,7 +95,12 @@ const Item: React.FC<Props> = ({ item, placeOrder, user }) => {
           </div>
         </div>
         <div className="flex justify-between px-6 mt-2 mb-5">
-          <button className="bg-green-700 py-1 px-2 rounded-md">
+          <button
+            className="bg-green-700 py-1 px-2 rounded-md"
+            onClick={() => {
+              addToCart(item);
+            }}
+          >
             <FontAwesomeIcon icon={faShoppingCart} className="text-white" />
             <span className="text-sm mx-1 text-white">Add</span>
           </button>

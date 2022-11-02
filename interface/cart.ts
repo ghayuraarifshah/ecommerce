@@ -1,7 +1,11 @@
 import item from "./item";
 
 type cart = {
-  items: item[];
+  _id?: string;
+  items: { item: item; quantity: number }[];
   total: number;
   quantity: number;
+  owner: string;
 };
+
+export default cart;

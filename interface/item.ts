@@ -1,5 +1,5 @@
 type item = {
-  id: any;
+  _id?: any;
   image: string;
   title: string;
   price: number;

@@ -1,15 +1,15 @@
 import mongoose from "mongoose";
 import type { NextApiRequest, NextApiResponse } from "next";
 import orderModel from "../../models/orders";
-import order from "../../interface/offers";
+import order from "../../interface/order";
 import userModel from "../../models/user";
 import user from "../../interface/user";
 import secret from "../../secret";
+import type error from "../../interface/error";
 interface Body {
   userId: string;
   order: order;
 }
-type error = { error: string };
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<user | error>
@@ -26,7 +26,7 @@ export default async function handler(
       res.status(200).send(user);
     } catch (e) {
       console.log(e);
-      res.status(404).send({ error: "failed to fetch data" });
+      res.status(404).send({ message: "failed to fetch data" });
     }
   }
 }

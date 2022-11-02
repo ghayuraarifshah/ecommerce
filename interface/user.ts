@@ -1,7 +1,7 @@
 import item from "./item";
 import order from "./order";
 type user = {
-  _id: any;
+  _id?: any;
   name: string;
   lastName: string;
   email: string;
