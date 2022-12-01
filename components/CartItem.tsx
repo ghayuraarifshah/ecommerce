@@ -15,7 +15,7 @@ const CartItem: React.FC<Props> = ({ item, quantity, removeItem }) => {
       <div className="mx-2 text-xl">{item.title}</div>
       <div className="flex mx-2 items-center">
         <p className="mx-2">Quantity: {quantity}</p>
-        <p className="mx-2">Total: ${quantity * Math.floor(item.price)}</p>
+        <p className="mx-2">Total: ${quantity * item.price}</p>
         <button
           className="bg-red-600 px-3 py-1 mx-5 rounded-md"
           onClick={() => removeItem({ item, quantity })}

@@ -12,12 +12,9 @@ export default async function handler(
   if (req.method === "POST") {
     try {
       const cart: cart = JSON.parse(req.body);
-      await cartModel.findByIdAndUpdate<cart>(cart._id, {
-        ...cart,
-      });
+      await cartModel.findByIdAndUpdate<cart>(cart._id, cart, { new: true });
       res.status(200).send(cart);
     } catch (e) {
-      console.log(e);
       res.status(404).send({ message: "failed to fetch data" });
     }
   }

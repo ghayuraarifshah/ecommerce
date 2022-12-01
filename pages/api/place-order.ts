@@ -25,7 +25,6 @@ export default async function handler(
       await user.save();
       res.status(200).send(user);
     } catch (e) {
-      console.log(e);
       res.status(404).send({ message: "failed to fetch data" });
     }
   }

@@ -1,10 +1,10 @@
 import type { NextPage } from "next";
 import Head from "next/head";
-import mongoose from "mongoose";
+import mongoose, { STATES } from "mongoose";
 import itemModel from "../models/items";
 import type item from "../interface/item";
 import Item from "../components/Item";
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { faArrowRight, faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Header from "../components/Header";
@@ -14,12 +14,23 @@ import order from "../interface/order";
 import secret from "../secret";
 import cart from "../interface/cart";
 import cartModel from "../models/cart";
+import UserContext from "../providers/userProvider";
+import CartContext from "../providers/cartProvider";
 interface Props {
   items: item[];
   user: user;
-  cart: cart;
+  initcart: cart;
 }
-const Home: NextPage<Props> = ({ items, user, cart }) => {
+const Home: NextPage<Props> = ({ items, user, initcart }) => {
+  const { setUser } = useContext(UserContext);
+  const { setCart } = useContext(CartContext);
+  useEffect(() => {
+    if (setUser && setCart) {
+      setUser(user);
+      setCart(initcart);
+    }
+  }, []);
+  const cart = initcart;
   const arrOfItems = [];
   for (let i = 0; i !== Math.ceil(items.length / 8); i++) {
     arrOfItems.push(items.slice(i * 8, (i + 1) * 8));
@@ -35,59 +46,8 @@ const Home: NextPage<Props> = ({ items, user, cart }) => {
     }
   }
   const [index, setIndex] = useState(0);
-  const [_cart, setCart] = useState<cart>(cart);
-  async function placeOrder(order: order) {
-    fetch("/api/place-order", {
-      method: "POST",
-      body: JSON.stringify({ userId: user._id, order: order }),
-    });
-  }
-  async function addToCart(item: item) {
-    const itemPresent = _cart.items.filter((el) => {
-      return el.item._id == item._id;
-    })[0];
-    if (itemPresent) {
-      const index = _cart.items.indexOf(itemPresent);
-      _cart.items[index].quantity += 1;
-      _cart.quantity += 1;
-      const totalArr = _cart.items.map((el) => {
-        return Math.floor(el.item.price) * el.quantity;
-      });
-      const total = totalArr.reduce(
-        (previousValue, currentValue) => previousValue + currentValue,
-        0
-      );
-      _cart.total = total;
-      try {
-        const res = await fetch("/api/change-cart", {
-          method: "POST",
-          body: JSON.stringify(_cart),
-        });
-        const newCart = await res.json();
-        setCart(newCart);
-      } catch (error) {
-        alert("Something went wrong");
-      }
-      return;
-    }
-    _cart.items.push({
-      item,
-      quantity: 1,
-    });
-    _cart.quantity += 1;
-    _cart.total +=
-      _cart.items[index].quantity * Math.floor(_cart.items[index].item.price);
-    const res = await fetch("/api/change-cart", {
-      method: "POST",
-      body: JSON.stringify(_cart),
-    });
-    const newCart = await res.json();
-    setCart(newCart);
-    return;
-  }
   return (
     <>
-      <Header user={user} cart={_cart} />
       <main>
         <Head>
           <title>Create Next App</title>
@@ -95,15 +55,8 @@ const Home: NextPage<Props> = ({ items, user, cart }) => {
         </Head>
         <main className="flex flex-col bg-white">
           <div className="flex flex-wrap">
-            {arrOfItems[index].map((el) => (
-              <Item
-                user={user}
-                item={el}
-                key={el._id}
-                placeOrder={placeOrder}
-                addToCart={addToCart}
-              />
-            ))}
+            {arrOfItems[index] &&
+              arrOfItems[index].map((el) => <Item item={el} key={el._id} />)}
           </div>
           <div className="flex mx-auto my-5 items-center ">
             <button onClick={() => changeIndex("sub")}>
@@ -172,7 +125,7 @@ export async function getServerSideProps() {
     props: {
       items: JSON.parse(JSON.stringify(items)),
       user: JSON.parse(JSON.stringify(user[0])),
-      cart: JSON.parse(JSON.stringify(cart)),
+      initcart: JSON.parse(JSON.stringify(cart)),
     },
   };
 }

@@ -4,15 +4,15 @@ import {
   faHeart,
   faShoppingCart,
 } from "@fortawesome/free-solid-svg-icons";
-import user from "../interface/user";
-import React, { useEffect, useRef } from "react";
+import React, { useContext } from "react";
 import Link from "next/link";
 import cart from "../interface/cart";
-interface Props {
-  user: user;
-  cart: cart;
-}
-const Header: React.FC<Props> = ({ user, cart }) => {
+import UserContext from "../providers/userProvider";
+import CartContext from "../providers/cartProvider";
+
+const Header: React.FC = () => {
+  const { user } = useContext(UserContext);
+  const { cart } = useContext(CartContext);
   return (
     <div className={`flex bg-purple-700 justify-between items-center`}>
       <div className="flex">
@@ -32,7 +32,7 @@ const Header: React.FC<Props> = ({ user, cart }) => {
       <div className="flex mx-5 my-auto h-9 items-center">
         <Link href="/user">
           <img
-            src={`https://avatars.dicebear.com/api/initials/${user.lastName}.svg`}
+            src={`https://avatars.dicebear.com/api/initials/${user?.lastName}.svg`}
             alt=""
             className="h-8 rounded-full cursor-pointer"
           />
@@ -43,9 +43,9 @@ const Header: React.FC<Props> = ({ user, cart }) => {
         />
         <div className="mx-3 relative">
           <div className="bg-white w-5 h-5 rounded-full ml-auto absolute top-[-15px] flex items-center justify-center right-0">
-            <p>{cart.quantity}</p>
+            <p>{cart?.quantity}</p>
           </div>
-          <Link href={`/cart/${user._id}`}>
+          <Link href={`/cart/${user?._id}`}>
             <FontAwesomeIcon
               icon={faShoppingCart}
               className="px-2 text-2xl text-white"

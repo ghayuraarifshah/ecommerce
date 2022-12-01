@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faStar,
@@ -14,12 +14,11 @@ import type itemType from "../interface/item";
 import ItemExtened from "./ItemExtened";
 import order from "../interface/order";
 import item from "../interface/item";
-import user from "../interface/user";
+import UserContext from "../providers/userProvider";
+import CartContext from "../providers/cartProvider";
+import OrderContext from "../providers/orderProvider";
 interface Props {
-  user: user;
   item: itemType;
-  placeOrder: (order: order) => void;
-  addToCart: (item: item) => void;
 }
 interface RatingsProp {
   ratings: number;
@@ -38,12 +37,15 @@ const Ratings: React.FC<RatingsProp> = ({ ratings }) => {
   }
   return <div className="">{item}</div>;
 };
-const Item: React.FC<Props> = ({ item, placeOrder, user, addToCart }) => {
+const Item: React.FC<Props> = ({ item }) => {
+  const { user } = useContext(UserContext);
+  const { addToCart } = useContext(CartContext);
+  const { placeOrder } = useContext(OrderContext);
   const [order, setOrder] = useState<order>({
     items: [item],
     quantity: 1,
-    total: Math.floor(item.price),
-    orderedBy: user._id,
+    total: item.price,
+    orderedBy: user?._id,
   });
   function changeQuatity(opp: "add" | "sub") {
     if (order.quantity <= 1 && opp == "sub") return;
@@ -51,8 +53,8 @@ const Item: React.FC<Props> = ({ item, placeOrder, user, addToCart }) => {
     setOrder({
       items: [item],
       quantity: newQuantity,
-      total: Math.floor(item.price) * newQuantity,
-      orderedBy: user._id,
+      total: item.price * newQuantity,
+      orderedBy: user?._id,
     });
     return;
   }
@@ -61,8 +63,9 @@ const Item: React.FC<Props> = ({ item, placeOrder, user, addToCart }) => {
   function closePopup() {
     setIsOpen(false);
   }
-  function _placeOrder() {
-    placeOrder(order);
+  async function _placeOrder() {
+    if (!user) return;
+    await placeOrder(order, user);
     setIsOpen(false);
   }
   return (
@@ -89,7 +92,7 @@ const Item: React.FC<Props> = ({ item, placeOrder, user, addToCart }) => {
           <p className="text-gray-700 text-base">{description + "..."}</p>
         </div>
         <div className="px-6 flex justify-between">
-          <span className="text-sm">Price: ${Math.floor(item.price)}</span>
+          <span className="text-sm">Price: ${item.price}</span>
           <div className="flex">
             <Ratings ratings={item.rating} />
           </div>
@@ -98,7 +101,9 @@ const Item: React.FC<Props> = ({ item, placeOrder, user, addToCart }) => {
           <button
             className="bg-green-700 py-1 px-2 rounded-md"
             onClick={() => {
-              addToCart(item);
+              if (item && addToCart) {
+                addToCart(item);
+              }
             }}
           >
             <FontAwesomeIcon icon={faShoppingCart} className="text-white" />

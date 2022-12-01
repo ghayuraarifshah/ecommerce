@@ -20,7 +20,7 @@ type user = {
     state: string;
     zipCode: number;
   };
-  favorites: item;
-  orders: order;
+  favorites?: item;
+  orders?: order;
 };
 export default user;
