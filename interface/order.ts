@@ -6,5 +6,6 @@ type order = {
   total: number;
   quantity: number;
   orderedBy: string;
+  orderedOn?: string;
 };
 export default order;

@@ -20,7 +20,8 @@ type user = {
     state: string;
     zipCode: number;
   };
-  favorites?: item;
-  orders?: order;
+  favorites?: item[];
+  orders?: order[];
+  save?: () => Promise<void>;
 };
 export default user;

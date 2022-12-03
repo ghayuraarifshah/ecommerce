@@ -38,7 +38,7 @@ const Ratings: React.FC<RatingsProp> = ({ ratings }) => {
   return <div className="">{item}</div>;
 };
 const Item: React.FC<Props> = ({ item }) => {
-  const { user } = useContext(UserContext);
+  const { user, addToFavorites } = useContext(UserContext);
   const { addToCart } = useContext(CartContext);
   const { placeOrder } = useContext(OrderContext);
   const [order, setOrder] = useState<order>({
@@ -68,6 +68,11 @@ const Item: React.FC<Props> = ({ item }) => {
     await placeOrder(order, user);
     setIsOpen(false);
   }
+  const icon =
+    user?.favorites?.findIndex((el) => el._id == item._id) !== -1
+      ? faHeart
+      : faHeartOutline;
+
   return (
     <>
       <ItemExtened
@@ -80,7 +85,13 @@ const Item: React.FC<Props> = ({ item }) => {
       />
       <div className="max-w-sm rounded overflow-hidden shadow-lg mx-4 my-5 relative z-0">
         <div className="absolute right-1 top-1 px-2 py-1 rounded-full bg-white">
-          <FontAwesomeIcon icon={faHeartOutline} className="text-pink-600" />
+          <FontAwesomeIcon
+            icon={icon}
+            className="text-pink-600"
+            onClick={() => {
+              addToFavorites(item);
+            }}
+          />
         </div>
         <img
           className="w-full"

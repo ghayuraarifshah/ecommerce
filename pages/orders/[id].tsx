@@ -6,11 +6,12 @@ import type order from "../../interface/order";
 import type { NextPageContext } from "next/";
 import userModel from "../../models/user";
 import type user from "../../interface/user";
-import Header from "../../components/Header";
 import cart from "../../interface/cart";
 import cartModel from "../../models/cart";
 import { useContext, useEffect } from "react";
 import UserContext from "../../providers/userProvider";
+import OrderItem from "../../components/OderItem";
+import CartContext from "../../providers/cartProvider";
 interface Props {
   orders: order[];
   user: user;
@@ -18,9 +19,11 @@ interface Props {
 }
 const Orders: NextPage<Props> = ({ orders, user, cart }) => {
   const { setUser } = useContext(UserContext);
+  const { setCart } = useContext(CartContext);
   useEffect(() => {
-    if (setUser) {
+    if (setUser && setCart) {
       setUser(user);
+      setCart(cart);
     }
   }, []);
   return (
@@ -31,7 +34,9 @@ const Orders: NextPage<Props> = ({ orders, user, cart }) => {
       </Head>
       <main className="h-screen mt-15">
         {orders.length === 0 && <p>No orders</p>}
-        {orders.map((el) => el.quantity)}
+        {orders.map((el) => (
+          <OrderItem key={el._id} order={el} />
+        ))}
       </main>
     </>
   );
@@ -43,9 +48,20 @@ export async function getServerSideProps(context: NextPageContext) {
   const conn = await mongoose.connect(
     "mongodb://127.0.0.1:6000/ecommerse?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+1.4.2"
   );
-  const orders: order[] = await orderModel.find<order>({ orderedBy: id });
+  const orders: order[] = await orderModel
+    .find<order>({ orderedBy: id })
+    .populate("items");
   const user: user[] | null = await userModel.find<user>();
-  const cart: cart | null = await cartModel.findOne({ owner: user[0]._id });
+  const cart: cart | null = await cartModel
+    .findOne<cart>({ owner: id })
+    .populate({
+      path: "items",
+      populate: {
+        path: "item",
+        model: "item",
+      },
+    });
+
   return {
     props: {
       orders: JSON.parse(JSON.stringify(orders)),

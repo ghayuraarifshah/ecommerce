@@ -1,16 +1,14 @@
 import type { NextPage } from "next";
 import Head from "next/head";
-import mongoose, { STATES } from "mongoose";
+import mongoose from "mongoose";
 import itemModel from "../models/items";
 import type item from "../interface/item";
 import Item from "../components/Item";
 import { useContext, useEffect, useState } from "react";
 import { faArrowRight, faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import Header from "../components/Header";
 import user from "../interface/user";
 import userModel from "../models/user";
-import order from "../interface/order";
 import secret from "../secret";
 import cart from "../interface/cart";
 import cartModel from "../models/cart";
@@ -93,7 +91,9 @@ const Home: NextPage<Props> = ({ items, user, initcart }) => {
 export async function getServerSideProps() {
   const conn = await mongoose.connect(secret.monogo);
   const items: item[] = await itemModel.find();
-  const user: user[] = await userModel.find();
+  const user: user[] = await userModel.find().populate({
+    path: "favorites",
+  });
   const cart: cart | null = await cartModel
     .findOne<cart>({ owner: user[0]._id })
     .populate({

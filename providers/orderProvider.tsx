@@ -50,7 +50,7 @@ export const OrderProvider: React.FC<Props> = ({ children }) => {
     };
     await fetch("/api/change-cart", {
       method: "POST",
-      body: JSON.stringify({ newCart }),
+      body: JSON.stringify(newCart),
     });
     return;
   }
