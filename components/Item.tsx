@@ -1,42 +1,25 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faStar,
   faShoppingCart,
   faShoppingBag,
   faHeart,
 } from "@fortawesome/free-solid-svg-icons";
-import {
-  faStar as faStarOutline,
-  faHeart as faHeartOutline,
-} from "@fortawesome/free-regular-svg-icons";
+import { faHeart as faHeartOutline } from "@fortawesome/free-regular-svg-icons";
 import type itemType from "../interface/item";
 import ItemExtened from "./ItemExtened";
 import order from "../interface/order";
-import item from "../interface/item";
 import UserContext from "../providers/userProvider";
 import CartContext from "../providers/cartProvider";
 import OrderContext from "../providers/orderProvider";
+import Link from "next/link";
+import { Ratings } from "./Ratings";
 interface Props {
   item: itemType;
 }
-interface RatingsProp {
+export interface RatingsProp {
   ratings: number;
 }
-const Ratings: React.FC<RatingsProp> = ({ ratings }) => {
-  const item = [];
-  for (let i = 1; i !== 6; i++) {
-    const classname = i < ratings ? "text-yellow-300" : "text-grey-600";
-    item.push(
-      <FontAwesomeIcon
-        icon={i < ratings ? faStar : faStarOutline}
-        key={Math.random()}
-        className={classname}
-      />
-    );
-  }
-  return <div className="">{item}</div>;
-};
 const Item: React.FC<Props> = ({ item }) => {
   const { user, addToFavorites } = useContext(UserContext);
   const { addToCart } = useContext(CartContext);
@@ -83,7 +66,7 @@ const Item: React.FC<Props> = ({ item }) => {
         order={order}
         placeOrder={_placeOrder}
       />
-      <div className="max-w-sm rounded overflow-hidden shadow-lg mx-4 my-5 relative z-0">
+      <div className="w-full rounded overflow-hidden shadow-lg my-5 relative z-0">
         <div className="absolute right-1 top-1 px-2 py-1 rounded-full bg-white">
           <FontAwesomeIcon
             icon={icon}
@@ -93,11 +76,9 @@ const Item: React.FC<Props> = ({ item }) => {
             }}
           />
         </div>
-        <img
-          className="w-full"
-          src={item.image}
-          alt="Sunset in the mountains"
-        />
+        <Link href={`/items/${item._id}`}>
+          <img className="w-full" src={item.image} alt={item.title} />
+        </Link>
         <div className="px-6 py-4">
           <div className="font-bold text-xl mb-2">{item.title}</div>
           <p className="text-gray-700 text-base">{description + "..."}</p>

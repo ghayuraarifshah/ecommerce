@@ -5,9 +5,11 @@ type userContextType = {
   user?: user;
   setUser?: (user: user) => void;
   addToFavorites: (item: item) => Promise<void>;
+  changeUser: (user: user) => Promise<user>;
 };
 const UserContext = createContext<userContextType>({
   addToFavorites: async (item: item) => {},
+  changeUser: (user: user) => new Promise(() => {}),
 });
 
 interface Props {
@@ -31,10 +33,20 @@ export const UserProvider: React.FC<Props> = ({ children }) => {
       alert("Something went wronf");
     }
   }
+  async function changeUser(user: user) {
+    const res = await fetch("/api/change-user-settings", {
+      method: "POST",
+      body: JSON.stringify(user),
+    });
+    const newUser = await res.json();
+    setUser(newUser);
+    return newUser;
+  }
   const store = {
     user,
     setUser,
     addToFavorites,
+    changeUser,
   };
   return <UserContext.Provider value={store}>{children}</UserContext.Provider>;
 };

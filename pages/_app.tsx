@@ -12,9 +12,11 @@ function MyApp({ Component, pageProps }: AppProps) {
       <UserProvider>
         <CartProvider>
           <OrderProvider>
-            <Header />
-            <Component {...pageProps} />
-            <Footer />
+            <>
+              <Header />
+              <Component {...pageProps} />
+              <Footer />
+            </>
           </OrderProvider>
         </CartProvider>
       </UserProvider>

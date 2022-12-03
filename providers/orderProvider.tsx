@@ -13,7 +13,7 @@ const OrderContext = createContext<orderContextType>({
   placeOrderFromCart: (cart: cart, user: user) => new Promise(() => {}),
 });
 interface Props {
-  children: React.ReactNode;
+  children: JSX.Element;
 }
 export const OrderProvider: React.FC<Props> = ({ children }) => {
   async function placeOrder(order: order, user: user) {

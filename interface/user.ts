@@ -13,7 +13,7 @@ type user = {
     state: string;
     zipCode: number;
   };
-  shippingAdress: {
+  shippingAddress: {
     addressLine1: string;
     addressLine2: string;
     city: string;
