@@ -9,7 +9,7 @@ const itemSchema = new Schema({
   rating: Number,
   description: String,
 });
-
+itemSchema.index({ title: "text", description: "text" });
 const itemModel = mongoose.models.item || model("item", itemSchema);
 
 export default itemModel;

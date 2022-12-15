@@ -11,10 +11,12 @@ import Link from "next/link";
 import UserContext from "../providers/userProvider";
 import CartContext from "../providers/cartProvider";
 import { Router } from "next/router";
+import SearchModal from "./SearchModal";
 
 const Header: React.FC = () => {
   const { user } = useContext(UserContext);
   const { cart } = useContext(CartContext);
+  const [isItemsOpen, setisItemsOpen] = useState<boolean>(false);
   const [isOpen, setIsOpen] = useState(false);
   useEffect(() => {
     Router.events.on("routeChangeStart", () => {
@@ -23,12 +25,16 @@ const Header: React.FC = () => {
   }, []);
   return (
     <div className={`flex bg-purple-700 justify-between items-center`}>
+      <SearchModal isOpen={isItemsOpen} close={() => setisItemsOpen(false)} />
       <div className="flex">
         <div className="p-3">
           <span className="text-3xl">🏪</span>
           <span className="p-2 text-2xl text-white">E-Cart</span>
         </div>
-        <div className="md:block my-auto bg-white rounded-sm hidden">
+        <div
+          className="md:block my-auto bg-white rounded-sm hidden"
+          onClick={() => setisItemsOpen(true)}
+        >
           <input
             type="text"
             className="rounded-sm h-8 px-2 focus-visible:outline-none"
